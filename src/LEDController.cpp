@@ -46,6 +46,7 @@ int LEDController::init(const std::vector<int> &shape) {
     }
 
     // initialize GPIO_PIN
+    closeGPIO();
     gpioInit();
 
     for (int i = 0; i < stripNum; i++) {
@@ -86,13 +87,13 @@ int LEDController::play(const std::vector<std::vector<int>> &statusLists) {
     ws2811_return_t ret;
 
     for (int i = 0; i < stripNum; i++) {
-        //      printf("Strip %d: ", i);
+        printf("Strip %d: ", i);
         select_channel(i);
-        //      printf("Count: %d.\n", ledstring.channel[0].count);
+        // printf("Count: %d.\n", ledstring.channel[0].count);
         for (int j = 0; j < stripShape[i]; j++) {
             LEDColor led(statusLists[i][j]);
 
-            //          printf("%X, ", led.getRGB());
+            printf("%X, ", led.getRGB());
 
             ledString[i].channel[0].leds[j] = led.getRGB();
             // if (j == 0) printf("rgb now: %X\n\n", led.getRGB());
@@ -103,7 +104,7 @@ int LEDController::play(const std::vector<std::vector<int>> &statusLists) {
             return ret;
         }
         usleep(stripShape[i] * 30);
-        //      printf("\n========================\n");
+        printf("\n========================\n");
     }
     return 0;
 }
@@ -317,7 +318,30 @@ void LEDController::select_channel(int channel) {
     }
 }
 
-void LEDController::fini() {
+void LEDController::closeGPIO() {
+    int fd = open("/sys/class/gpio/unexport", O_WRONLY);
+    if (fd == -1) {
+        perror("Unable to open /sys/class/gpio/unexport");
+        // exit(1);
+    }
+
+    if (write(fd, "23", 2) != 2) {
+        perror("Error writing to /sys/class/gpio/unexport");
+        // exit(1);
+    }
+
+    if (write(fd, "24", 2) != 2) {
+        perror("Error writing to /sys/class/gpio/unexport");
+        // exit(1);
+    }
+
+    if (write(fd, "25", 2) != 2) {
+        perror("Error writing to /sys/class/gpio/unexport");
+        // exit(1);
+    }
+}
+
+void LEDController::finish() {
     stripShape.clear();
     for (int i = 0; i < stripNum; i++) ws2811_fini(&ledString[i]);
 
@@ -326,26 +350,7 @@ void LEDController::fini() {
     close(A1);
     close(A2);
 
-    int fd = open("/sys/class/gpio/unexport", O_WRONLY);
-    if (fd == -1) {
-        perror("Unable to open /sys/class/gpio/unexpect");
-        exit(1);
-    }
-
-    if (write(fd, "23", 2) != 2) {
-        perror("Error writing to /sys/class/gpio/unexpect");
-        exit(1);
-    }
-
-    if (write(fd, "24", 2) != 2) {
-        perror("Error writing to /sys/class/gpio/unexpect");
-        exit(1);
-    }
-
-    if (write(fd, "25", 2) != 2) {
-        perror("Error writing to /sys/class/gpio/unexpect");
-        exit(1);
-    }
+    closeGPIO();
 }
 
 // void LEDController::delayMicroseconds (int delay_us)

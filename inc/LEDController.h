@@ -49,15 +49,14 @@ class LEDController {
     LEDController();
 
     int init(const std::vector<int> &shape);
-
     int sendAll(const std::vector<std::vector<int>> &statusLists);
     // send all data to RPI and push them to LED strips.
     // return value:
     // 0: OK
     // -1: The data size of statausLists is not consist with number of strips
     // initialized
-
-    void fini();
+    void closeGPIO();
+    void finish();
 
    private:
     ws2811_t ledString[8] = {
