@@ -52,7 +52,7 @@ class LEDController {
     // -1: The data size of statausLists is not consist with number of strips
     // initialized
 
-    void fini();
+    void finish();
 
    private:
     ws2811_t ledString[2] = {

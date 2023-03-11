@@ -116,7 +116,7 @@ int LEDController::play(const std::vector<std::vector<int>> &statusLists) {
     return 0;
 }
 
-void LEDController::fini() {
+void LEDController::finish() {
     stripShape.clear();
     ws2811_fini(&ledString[0]);
     ws2811_fini(&ledString[1]);
