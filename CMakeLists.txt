@@ -11,6 +11,7 @@ add_library(
     hardware
     STATIC
     src/LEDController.cpp
+    src/LEDController_umb.cpp
     src/OFController.cpp
 )
 target_include_directories(

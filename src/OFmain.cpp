@@ -17,10 +17,35 @@ int main()
 
     for (int i = 0; i < 5*OFnum; i++)
     {
-        status[i] = 0x00aa00aa;
+        status[i] = 0xaa000010;
     }
 
     OF.sendAll(status);
+    usleep(1000000);
+
+    for (int i = 0; i < 5*OFnum; i++)
+    {
+        status[i] = 0x00aa0010;
+    }
+
+    OF.sendAll(status);
+    usleep(1000000);
+
+    for (int i = 0; i < 5*OFnum; i++)
+    {
+        status[i] = 0x0000aa10;
+    }
+
+    OF.sendAll(status);
+    usleep(1000000);
+
+    for (int i = 0; i < 5*OFnum; i++)
+    {
+        status[i] = 0x00000010;
+    }
+
+    OF.sendAll(status);
+
     
     return 0;
 }  

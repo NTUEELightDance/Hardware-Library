@@ -1,8 +1,8 @@
 #include "LEDController_umb.h"
 
-LEDColor::LEDColor() : r(0), g(0), b(0), rgb(0) {}
+LEDColor_umb::LEDColor_umb() : r(0), g(0), b(0), rgb(0) {}
 
-LEDColor::LEDColor(const int &colorCode) {
+LEDColor_umb::LEDColor_umb(const int &colorCode) {
     const int R = (colorCode >> 24) & 0xff;
     const int G = (colorCode >> 16) & 0xff;
     const int B = (colorCode >> 8) & 0xff;
@@ -19,13 +19,13 @@ LEDColor::LEDColor(const int &colorCode) {
     rgb = ((r << 16) + (g << 8) + b);
 }
 
-uint32_t LEDColor::getRGB() { return rgb; }
+uint32_t LEDColor_umb::getRGB() { return rgb; }
 
-LEDController::LEDController() {
+LEDController_umb::LEDController_umb() {
     // if (stripShape != NULL) stripShape = NULL;
 }
 
-int LEDController::init(const std::vector<int> &shape) {
+int LEDController_umb::init(const std::vector<int> &shape) {
     // member variables initialization
     stripShape.assign(shape.begin(), shape.end());
 
@@ -69,7 +69,7 @@ int LEDController::init(const std::vector<int> &shape) {
     return WS2811_SUCCESS;
 }
 
-int LEDController::sendAll(const std::vector<std::vector<int>> &statusLists) {
+int LEDController_umb::sendAll(const std::vector<std::vector<int>> &statusLists) {
     // Check if data size is consistent with stored during initialization
 
     if (statusLists[0].size() > stripShape[0]) {
@@ -87,11 +87,11 @@ int LEDController::sendAll(const std::vector<std::vector<int>> &statusLists) {
     return 0;
 }
 
-int LEDController::play(const std::vector<std::vector<int>> &statusLists) {
+int LEDController_umb::play(const std::vector<std::vector<int>> &statusLists) {
     ws2811_return_t ret;
 
     for (int i=0 ; i<stripShape[0]; i++){
-        LEDColor led(statusLists[0][i]);
+        LEDColor_umb led(statusLists[0][i]);
         ledString[0].channel[0].leds[i] = led.getRGB();
         if (i == 0) printf("rgb now: %X\n\n", led.getRGB());
 
@@ -103,7 +103,7 @@ int LEDController::play(const std::vector<std::vector<int>> &statusLists) {
     usleep(stripShape[0] * 30);
 
     for (int i=0 ; i<stripShape[1]; i++){
-        LEDColor led(statusLists[1][i]);
+        LEDColor_umb led(statusLists[1][i]);
         ledString[1].channel[0].leds[i] = led.getRGB();
         if (i == 0) printf("rgb now: %X\n\n", led.getRGB());
 
@@ -116,7 +116,7 @@ int LEDController::play(const std::vector<std::vector<int>> &statusLists) {
     return 0;
 }
 
-void LEDController::finish() {
+void LEDController_umb::finish() {
     stripShape.clear();
     ws2811_fini(&ledString[0]);
     ws2811_fini(&ledString[1]);
