@@ -1,4 +1,5 @@
 #include "LEDController.h"
+
 #include "LEDController_umb.h"
 
 LEDColor::LEDColor() : r(0), g(0), b(0), rgb(0) {}
@@ -16,7 +17,9 @@ LEDColor::LEDColor(const int &colorCode) {
     r = (int)(pow(R * A, (1 / gamma)));
     g = (int)(pow(G * A, (1 / gamma)));
     b = (int)(pow(B * A, (1 / gamma)));
+#ifdef HARDWARE_DEBUG
     printf("%X, %X, %X", r, g, b);
+#endif
     rgb = ((r << 16) + (g << 8) + b);
 }
 
@@ -30,12 +33,11 @@ LEDController::LEDController() {
 
 int LEDController::init(const std::vector<int> &shape) {
     // member variables initialization
-    if (shape.size() == 2)
-    {
-	  isumb = true;
-	  return umb.init(shape);
+    if (shape.size() == 2) {
+        isumb = true;
+        return umb.init(shape);
     }
-    isumb = false; 
+    isumb = false;
     stripNum = shape.size();
     stripShape.assign(shape.begin(), shape.end());
 
@@ -45,7 +47,8 @@ int LEDController::init(const std::vector<int> &shape) {
     for (int i = 0; i < stripNum; i++) {
         ledString[i].channel[0].count = shape[i];
         if ((ret = ws2811_init(&ledString[i])) != WS2811_SUCCESS) {
-            fprintf(stderr, "ws2811_init %d failed: %s\n", i, ws2811_get_return_t_str(ret));
+            fprintf(stderr, "ws2811_init %d failed: %s\n", i,
+                    ws2811_get_return_t_str(ret));
             return ret;
         }
     }
@@ -62,7 +65,8 @@ int LEDController::init(const std::vector<int> &shape) {
         }
 
         if ((ret = ws2811_render(&ledString[i])) != WS2811_SUCCESS) {
-            fprintf(stderr, "ws2811_render %d failed: %s\n", i, ws2811_get_return_t_str(ret));
+            fprintf(stderr, "ws2811_render %d failed: %s\n", i,
+                    ws2811_get_return_t_str(ret));
             return ret;
         }
         usleep(stripShape[i] * 30);
@@ -74,11 +78,11 @@ int LEDController::init(const std::vector<int> &shape) {
 
 int LEDController::sendAll(const std::vector<std::vector<int>> &statusLists) {
     // Check if data size is consistent with stored during initialization
-    if (isumb)	return	umb.sendAll(statusLists);
+    if (isumb) return umb.sendAll(statusLists);
     for (int i = 0; i < stripNum; i++) {
         if (statusLists[i].size() > stripShape[i]) {
-            printf("Error: Strip %d is longer then init settings: %d", (int)statusLists[i].size(),
-                   stripShape[i]);
+            printf("Error: Strip %d is longer then init settings: %d",
+                   (int)statusLists[i].size(), stripShape[i]);
             return -1;
         }
     }
@@ -101,11 +105,14 @@ int LEDController::play(const std::vector<std::vector<int>> &statusLists) {
             //          printf("%X, ", led.getRGB());
 
             ledString[i].channel[0].leds[j] = led.getRGB();
+#ifdef HARDWARE_DEBUG
             if (j == 0) printf("rgb now: %X\n\n", led.getRGB());
+#endif
         }
 
         if ((ret = ws2811_render(&ledString[i])) != WS2811_SUCCESS) {
-            fprintf(stderr, "ws2811_render %d failed: %s\n", i, ws2811_get_return_t_str(ret));
+            fprintf(stderr, "ws2811_render %d failed: %s\n", i,
+                    ws2811_get_return_t_str(ret));
             return ret;
         }
         usleep(stripShape[i] * 30);
@@ -324,10 +331,9 @@ void LEDController::select_channel(int channel) {
 }
 
 void LEDController::finish() {
-    if(isumb)
-    {
-	    umb.finish();
-	    return;
+    if (isumb) {
+        umb.finish();
+        return;
     }
     stripShape.clear();
     for (int i = 0; i < stripNum; i++) ws2811_fini(&ledString[i]);

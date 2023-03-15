@@ -15,7 +15,9 @@ LEDColor_umb::LEDColor_umb(const int &colorCode) {
     r = (int)(pow(R * A, (1 / gamma)));
     g = (int)(pow(G * A, (1 / gamma)));
     b = (int)(pow(B * A, (1 / gamma)));
+    #ifdef HARDWARE_DEBUG
     printf("%X, %X, %X", r, g, b);
+    #endif
     rgb = ((r << 16) + (g << 8) + b);
 }
 
@@ -93,7 +95,9 @@ int LEDController_umb::play(const std::vector<std::vector<int>> &statusLists) {
     for (int i=0 ; i<stripShape[0]; i++){
         LEDColor_umb led(statusLists[0][i]);
         ledString[0].channel[0].leds[i] = led.getRGB();
+    #ifdef HARDWARE_DEBUG
         if (i == 0) printf("rgb now: %X\n\n", led.getRGB());
+    #endif
 
     }
     if ((ret = ws2811_render(&ledString[0])) != WS2811_SUCCESS) {

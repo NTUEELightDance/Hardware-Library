@@ -10,15 +10,15 @@ OFColor::OFColor(const int &colorCode) {
     const int B = (colorCode >> 8) & 0xff;
     const int A = (colorCode >> 0) & 0xff;
 
-/*    // TODO: convert rgba to rgb
-    const float gamma = 2.2;
-    // convert rgba to rgb
+    /*    // TODO: convert rgba to rgb
+        const float gamma = 2.2;
+        // convert rgba to rgb
 
-    // GAMMA CORRECTION
-    r = (int)(pow(R * A, (1 / gamma)));
-    g = (int)(pow(G * A, (1 / gamma)));
-    b = (int)(pow(B * A, (1 / gamma)));
-*/
+        // GAMMA CORRECTION
+        r = (int)(pow(R * A, (1 / gamma)));
+        g = (int)(pow(G * A, (1 / gamma)));
+        b = (int)(pow(B * A, (1 / gamma)));
+    */
     r = R;
     g = G;
     b = B;
@@ -34,7 +34,9 @@ OFController::OFController() {}
 
 int OFController::init() {
     unsigned char buffer[10];
+#ifdef HARDWARE_DEBUG
     printf("Hardware Initialzed\n");
+#endif
 
     // open I2C bus
     for (int i = 0; i < NUMPCA; i++) {
@@ -42,36 +44,41 @@ int OFController::init() {
             printf("I2C of %d init fail.\n", i);
             return 1;
         }
+#ifdef HARDWARE_DEBUG
         printf("File descriptor of %d opened at %d.\n", i, fd[i]);
+#endif
 
         if (ioctl(fd[i], I2C_SLAVE, PCAAddr[i]) < 0) {
             printf("Failed to acquire bus access and/or talk to slave %d", i);
             return 2;
         }
     }
+#ifdef HARDWARE_DEBUG
     printf("======================\n\n");
+#endif
 
     // write to PCA
-    buffer[0] = 0x45;   // 0x45
+    buffer[0] = 0x45;  // 0x45
     buffer[1] = 0xFF;  // 0xFF
 
     for (int i = 0; i < NUMPCA; i++) {
         if (write(fd[i], buffer, 2) != 2) {
             printf("Failed to write to I2C bus %d.\n", i);
-	}
-	printf("Now sending: ");
-	for (int j = 0; j < 2; j++)
-		printf("%d, ", buffer[j]);
-	printf("\n");
-        
+        }
+#ifdef HARDWARE_DEBUG
+        printf("Now sending: ");
+        for (int j = 0; j < 2; j++) printf("%d, ", buffer[j]);
+        printf("\n");
+#endif
     }
-
     return 1;
 }
 
 int OFController::sendAll(const vector<int> &statusLists) {
     unsigned char buffer[20];
+#ifdef HARDWARE_DEBUG
     printf("%d strips sent\n", (int)statusLists.size());
+#ifdef HARDWARE_DEBUG
     // OFController RGBData[(int)statusLists.size()];
     buffer[0] = 136;  // 0x88
     int counter;
@@ -87,7 +94,7 @@ int OFController::sendAll(const vector<int> &statusLists) {
         }
         if (write(fd[i], buffer, 16) != 16) {
             printf("Failed to write to the I2C bus %d.\n", i);
-            //return 4;
+            // return 4;
         }
     }
 
