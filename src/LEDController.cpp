@@ -9,14 +9,15 @@ LEDColor::LEDColor(const int &colorCode) {
     const int G = (colorCode >> 16) & 0xff;
     const int B = (colorCode >> 8) & 0xff;
     const int A = (colorCode >> 0) & 0xff;
+    double a = A / 15.0;
 
     const float gamma = 1;
     // convert rgba to rgb
 
     // GAMMA CORRECTION
-    r = (int)(pow(R * A, (1 / gamma)));
-    g = (int)(pow(G * A, (1 / gamma)));
-    b = (int)(pow(B * A, (1 / gamma)));
+    r = (int)(pow(R * a, (1.0 / gamma)));
+    g = (int)(pow(G * a, (1.0 / gamma)));
+    b = (int)(pow(B * a, (1.0 / gamma)));
 #ifdef HARDWARE_DEBUG
     printf("%X, %X, %X", r, g, b);
 #endif
