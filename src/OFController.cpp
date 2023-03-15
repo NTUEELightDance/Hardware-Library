@@ -69,8 +69,8 @@ int OFController::init() {
         printf("Now sending: ");
         for (int j = 0; j < 2; j++) printf("%d, ", buffer[j]);
         printf("\n");
-    }
 #endif
+    }
 
     return 1;
 }
