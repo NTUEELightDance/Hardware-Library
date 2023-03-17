@@ -18,52 +18,47 @@ OFColor::OFColor(const int &colorCode) {
     float r_cal, g_cal, b_cal;
     float r_max, g_max, b_max;
 
-    if (A > 100)
-    {
-	    // r = 80;
-	    // g = 255;
-	    // b = 130;
-        A = 100;
+    if (A > 100) {
+        // r = 80;
+        // g = 255;
+        // b = 130;
+        a = 100;
     }
-    if (A <= 0)
-    {
+    if (A <= 0) {
         r = g = b = 0;
         rgb = 0;
         return;
-    }
-    else if ((R + G + B) > 0)
-    {
-	    float a = A / 100.0;
-	    // printf("A = %d\n", A);
-	    r_cal = (1.0) * R / (R + G + B);
-	    g_cal = (1.0) * G / (R + G + B);
-	    b_cal = (1.0) * B / (R + G + B);
+    } else if ((R + G + B) > 0) {
+        float a = A / 100.0;
+        // printf("A = %d\n", A);
+        r_cal = (1.0) * R / (R + G + B);
+        g_cal = (1.0) * G / (R + G + B);
+        b_cal = (1.0) * B / (R + G + B);
 
-	    // printf("Ratio: r = %f, g = %f, b = %f\n", r_cal, g_cal, b_cal);
+        // printf("Ratio: r = %f, g = %f, b = %f\n", r_cal, g_cal, b_cal);
 
-	    r_max = r_cal * MAX_BRIGHTNESS_R;
-	    g_max = g_cal * MAX_BRIGHTNESS_G;
-	    b_max = b_cal * MAX_BRIGHTNESS_B;
-	    r_cal *= a * MAX_BRIGHTNESS_R;
-	    g_cal *= a * MAX_BRIGHTNESS_G;
-	    b_cal *= a * MAX_BRIGHTNESS_B;
-	    // printf("Before gamma: r = %f, g = %f, b = %f\n", r_cal, g_cal, b_cal);
-	    // printf("Max value: r = %f, g = %f, b = %f\n", r_max, g_max, b_max);
+        r_max = r_cal * MAX_BRIGHTNESS_R;
+        g_max = g_cal * MAX_BRIGHTNESS_G;
+        b_max = b_cal * MAX_BRIGHTNESS_B;
+        r_cal *= a * MAX_BRIGHTNESS_R;
+        g_cal *= a * MAX_BRIGHTNESS_G;
+        b_cal *= a * MAX_BRIGHTNESS_B;
+        // printf("Before gamma: r = %f, g = %f, b = %f\n", r_cal, g_cal,
+        // b_cal); printf("Max value: r = %f, g = %f, b = %f\n", r_max, g_max,
+        // b_max);
 
-	    r_cal = (r_cal > 0)?pow((r_cal / r_max), r_gamma) * r_max:0;
-	    g_cal = (g_cal > 0)?pow((g_cal / g_max), g_gamma) * g_max:0;
-	    b_cal = (b_cal > 0)?pow((b_cal / b_max), b_gamma) * b_max:0;
-	    // printf("After gamma: r = %f, g = %f, b = %f\n", r_cal, g_cal, b_cal);
+        r_cal = (r_cal > 0) ? pow((r_cal / r_max), r_gamma) * r_max : 0;
+        g_cal = (g_cal > 0) ? pow((g_cal / g_max), g_gamma) * g_max : 0;
+        b_cal = (b_cal > 0) ? pow((b_cal / b_max), b_gamma) * b_max : 0;
+        // printf("After gamma: r = %f, g = %f, b = %f\n", r_cal, g_cal, b_cal);
 
-	    r = int(r_cal);
-	    g = int(g_cal);
-	    b = int(b_cal);
+        r = int(r_cal);
+        g = int(g_cal);
+        b = int(b_cal);
 
-    }
-    else
-    {
-	    r = g = b = 0;
-	    return;
+    } else {
+        r = g = b = 0;
+        return;
     }
     // printf("FINAL: R = %d, G = %d, B = %d\n", r, g, b);
 }
@@ -89,25 +84,25 @@ int OFController::init() {
         // printf("File descriptor of %d opened at %d.\n", i, fd[i]);
 
         if (ioctl(fd[i], I2C_SLAVE, PCAAddr[i]) < 0) {
-            fprintf(stderr, "Failed to acquire bus access and/or talk to slave %d", i);
+            fprintf(stderr,
+                    "Failed to acquire bus access and/or talk to slave %d", i);
             return 2;
         }
     }
     // printf("======================\n\n");
 
     // write to PCA
-    buffer[0] = 0x45;   // 0x45
+    buffer[0] = 0x45;  // 0x45
     buffer[1] = 0xFF;  // 0xFF
 
     for (int i = 0; i < NUMPCA; i++) {
         if (write(fd[i], buffer, 2) != 2) {
             fprintf(stderr, "Failed to write to I2C bus %x.\n", PCAAddr[i]);
-	}
-	// printf("Now sending: ");
-	// for (int j = 0; j < 2; j++)
-	// 	printf("%d, ", buffer[j]);
-	// printf("\n");
-        
+        }
+        // printf("Now sending: ");
+        // for (int j = 0; j < 2; j++)
+        // 	printf("%d, ", buffer[j]);
+        // printf("\n");
     }
 
     return 1;
@@ -130,7 +125,8 @@ int OFController::sendAll(const vector<int> &statusLists) {
             counter++;
         }
         if (write(fd[i], buffer, 16) != 16) {
-            // printf(stderr, "Failed to write to the I2C bus %x.\n", PCAAddr[i]);
+            // printf(stderr, "Failed to write to the I2C bus %x.\n",
+            // PCAAddr[i]);
         }
     }
 
