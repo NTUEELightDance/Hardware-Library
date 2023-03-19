@@ -67,7 +67,9 @@ OFController::OFController() {}
 
 int OFController::init() {
     unsigned char buffer[10];
+#ifdef HARDWARE_DEBUG
     printf("I2C Hardware Initialzed\n");
+#endif
 
     // open I2C bus
     for (int i = 0; i < NUMPCA; i++) {
