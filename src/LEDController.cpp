@@ -1,5 +1,4 @@
 #include "LEDController.h"
-
 #include "LEDController_umb.h"
 
 LEDColor::LEDColor() : r(0), g(0), b(0), rgb(0) {}
@@ -7,15 +6,16 @@ LEDColor::LEDColor() : r(0), g(0), b(0), rgb(0) {}
 #define MAX_BRIGHTNESS_G 30
 #define MAX_BRIGHTNESS_B 30
 #define r_gamma 1.75
-#define g_gamma 1.75
-#define b_gamma 1.75
+#define g_gamma 2.3
+#define b_gamma 2.5
 
 LEDColor::LEDColor(const int &colorCode) {
     const int R = (colorCode >> 24) & 0xff;
     const int G = (colorCode >> 16) & 0xff;
     const int B = (colorCode >> 8) & 0xff;
     const int A = (colorCode >> 0) & 0xff;
-    if (A <= 0) {
+    if (A <= 0)
+    {
         r = g = b = 0;
         rgb = 0;
         return;
@@ -23,40 +23,46 @@ LEDColor::LEDColor(const int &colorCode) {
     float r_cal, g_cal, b_cal;
     float r_max, g_max, b_max;
 
-    if ((R + G + B) > 0) {
-        float a = A / 100.0;
-        if (a >= 1) a = 1;
-        // printf("A = %d\n", A);
-        r_cal = (1.0) * R / (R + G + B);
-        g_cal = (1.0) * G / (R + G + B);
-        b_cal = (1.0) * B / (R + G + B);
+    if ((R + G + B) > 0)
+    {
+	    float a = A / 100.0;
+        // if (a >= 1)  a = 1;
+	    // printf("A = %d\n", A);
+	    r_cal = (1.0) * R / (R + G + B);
+	    g_cal = (1.0) * G / (R + G + B);
+	    b_cal = (1.0) * B / (R + G + B);
 
-        // printf("Ratio: r = %f, g = %f, b = %f\n", r_cal, g_cal, b_cal);
+	    // printf("Ratio: r = %f, g = %f, b = %f\n", r_cal, g_cal, b_cal);
 
-        r_max = r_cal * MAX_BRIGHTNESS_R;
-        g_max = g_cal * MAX_BRIGHTNESS_G;
-        b_max = b_cal * MAX_BRIGHTNESS_B;
-        r_cal *= a * MAX_BRIGHTNESS_R;
-        g_cal *= a * MAX_BRIGHTNESS_G;
-        b_cal *= a * MAX_BRIGHTNESS_B;
-        // printf("Before gamma: r = %f, g = %f, b = %f\n", r_cal, g_cal,
-        // b_cal); printf("Max value: r = %f, g = %f, b = %f\n", r_max, g_max,
-        // b_max);
+	    r_max = r_cal * MAX_BRIGHTNESS_R;
+	    g_max = g_cal * MAX_BRIGHTNESS_G;
+	    b_max = b_cal * MAX_BRIGHTNESS_B;
+	    r_cal *= a * MAX_BRIGHTNESS_R;
+	    g_cal *= a * MAX_BRIGHTNESS_G;
+	    b_cal *= a * MAX_BRIGHTNESS_B;
+	    // printf("Before gamma: r = %f, g = %f, b = %f\n", r_cal, g_cal, b_cal);
+	    // printf("Max value: r = %f, g = %f, b = %f\n", r_max, g_max, b_max);
 
-        r_cal = (r_cal > 0) ? pow((r_cal / r_max), r_gamma) * r_max : 0;
-        g_cal = (g_cal > 0) ? pow((g_cal / g_max), g_gamma) * g_max : 0;
-        b_cal = (b_cal > 0) ? pow((b_cal / b_max), b_gamma) * b_max : 0;
-        // printf("After gamma: r = %f, g = %f, b = %f\n", r_cal, g_cal, b_cal);
+	    r_cal = (r_cal > 0)?pow((r_cal / r_max), r_gamma) * r_max:0;
+	    g_cal = (g_cal > 0)?pow((g_cal / g_max), g_gamma) * g_max:0;
+	    b_cal = (b_cal > 0)?pow((b_cal / b_max), b_gamma) * b_max:0;
+	    // printf("After gamma: r = %f, g = %f, b = %f\n", r_cal, g_cal, b_cal);
 
-        r = int(r_cal);
-        g = int(g_cal);
-        b = int(b_cal);
+	    r = int(r_cal);
+	    g = int(g_cal);
+	    b = int(b_cal);
+	    // printf("FINAL: R = %d, G = %d, B = %d\n", r, g, b);
+
+        if (r > 255)    r = 255;
+        if (g > 255)    g = 255;
+        if (b > 255)    b = 255;
         rgb = (r << 16) + (g << 8) + b;
-        // printf("FINAL: R = %d, G = %d, B = %d\n", r, g, b);
-    } else {
-        r = g = b = 0;
+    }
+    else
+    {
+	    r = g = b = 0;
         rgb = 0;
-        return;
+	    return;
     }
 }
 
@@ -70,15 +76,16 @@ LEDController::LEDController() {
 
 int LEDController::init(const std::vector<int> &shape) {
     // member variables initialization
-    if (shape.size() == 2) {
-        isumb = true;
-        return umb.init(shape);
+    if (shape.size() == 2)
+    {
+	  isumb = true;
+	  return umb.init(shape);
     }
 
     // Check all gpio pin closed
     close_gpio();
-
-    isumb = false;
+    
+    isumb = false; 
     stripNum = shape.size();
     stripShape.assign(shape.begin(), shape.end());
 
@@ -88,8 +95,7 @@ int LEDController::init(const std::vector<int> &shape) {
     for (int i = 0; i < stripNum; i++) {
         ledString[i].channel[0].count = shape[i];
         if ((ret = ws2811_init(&ledString[i])) != WS2811_SUCCESS) {
-            fprintf(stderr, "ws2811_init %d failed: %s\n", i,
-                    ws2811_get_return_t_str(ret));
+            fprintf(stderr, "ws2811_init %d failed: %s\n", i, ws2811_get_return_t_str(ret));
             return ret;
         }
     }
@@ -106,8 +112,7 @@ int LEDController::init(const std::vector<int> &shape) {
         }
 
         if ((ret = ws2811_render(&ledString[i])) != WS2811_SUCCESS) {
-            fprintf(stderr, "ws2811_render %d failed: %s\n", i,
-                    ws2811_get_return_t_str(ret));
+            fprintf(stderr, "ws2811_render %d failed: %s\n", i, ws2811_get_return_t_str(ret));
             return ret;
         }
         usleep(stripShape[i] * 30);
@@ -119,11 +124,11 @@ int LEDController::init(const std::vector<int> &shape) {
 
 int LEDController::sendAll(const std::vector<std::vector<int>> &statusLists) {
     // Check if data size is consistent with stored during initialization
-    if (isumb) return umb.sendAll(statusLists);
+    if (isumb)	return	umb.sendAll(statusLists);
     for (int i = 0; i < stripNum; i++) {
         if (statusLists[i].size() > stripShape[i]) {
-            fprintf(stderr, "Error: Strip %d is longer then init settings: %d",
-                    (int)statusLists[i].size(), stripShape[i]);
+            fprintf(stderr, "Error: Strip %d is longer then init settings: %d", (int)statusLists[i].size(),
+                   stripShape[i]);
             return -1;
         }
     }
@@ -150,8 +155,7 @@ int LEDController::play(const std::vector<std::vector<int>> &statusLists) {
         }
 
         if ((ret = ws2811_render(&ledString[i])) != WS2811_SUCCESS) {
-            fprintf(stderr, "ws2811_render %d failed: %s\n", i,
-                    ws2811_get_return_t_str(ret));
+            fprintf(stderr, "ws2811_render %d failed: %s\n", i, ws2811_get_return_t_str(ret));
             return ret;
         }
         usleep(stripShape[i] * 30);
@@ -370,9 +374,10 @@ void LEDController::select_channel(int channel) {
 }
 
 void LEDController::finish() {
-    if (isumb) {
-        umb.finish();
-        return;
+    if(isumb)
+    {
+	    umb.finish();
+	    return;
     }
     stripShape.clear();
     for (int i = 0; i < stripNum; i++) ws2811_fini(&ledString[i]);
@@ -380,10 +385,9 @@ void LEDController::finish() {
     close_gpio();
 }
 
-void LEDController::close_gpio() {
-#ifdef HARDWARE_DEBUG
+void LEDController::close_gpio()
+{
     printf("LED GPIO finished.\n");
-#endif
     close(A0);
     close(A1);
     close(A2);
@@ -395,21 +399,15 @@ void LEDController::close_gpio() {
     }
 
     if (write(fd, "23", 2) != 2) {
-#ifdef HARDWARE_DEBUG
         fprintf(stderr, "Error writing to /sys/class/gpio/unexport: 23\n");
-#endif
     }
 
     if (write(fd, "24", 2) != 2) {
-#ifdef HARDWARE_DEBUG
         fprintf(stderr, "Error writing to /sys/class/gpio/unexport: 24\n");
-#endif
     }
 
     if (write(fd, "25", 2) != 2) {
-#ifdef HARDWARE_DEBUG
         fprintf(stderr, "Error writing to /sys/class/gpio/unexport: 25\n");
-#endif
     }
 }
 
