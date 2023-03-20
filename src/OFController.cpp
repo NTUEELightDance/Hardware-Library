@@ -18,17 +18,9 @@ OFColor::OFColor(const int &colorCode) {
     float r_cal, g_cal, b_cal;
     float r_max, g_max, b_max;
 
-    if (A > 100)
-    {
-	    // r = 80;
-	    // g = 255;
-	    // b = 130;
-        A = 100;
-    }
     if (A <= 0)
     {
         r = g = b = 0;
-        rgb = 0;
         return;
     }
     else if ((R + G + B) > 0)
@@ -53,11 +45,15 @@ OFColor::OFColor(const int &colorCode) {
 	    r_cal = (r_cal > 0)?pow((r_cal / r_max), r_gamma) * r_max:0;
 	    g_cal = (g_cal > 0)?pow((g_cal / g_max), g_gamma) * g_max:0;
 	    b_cal = (b_cal > 0)?pow((b_cal / b_max), b_gamma) * b_max:0;
-	    // printf("After gamma: r = %f, g = %f, b = %f\n", r_cal, g_cal, b_cal);
 
-	    r = int(r_cal);
-	    g = int(g_cal);
-	    b = int(b_cal);
+        r = int(r_cal);
+        g = int(g_cal);
+        b = int(b_cal);
+	    // printf("FINAL: R = %d, G = %d, B = %d\n", r, g, b);
+
+        if (r > 255)    r = 255;
+        if (g > 255)    g = 255;
+        if (b > 255)    b = 255;
 
     }
     else

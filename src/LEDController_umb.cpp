@@ -13,7 +13,6 @@ LEDColor_umb::LEDColor_umb(const int &colorCode) {
     const int G = (colorCode >> 16) & 0xff;
     const int B = (colorCode >> 8) & 0xff;
     const int A = (colorCode >> 0) & 0xff;
-    if (A > 100)    A = 100;
     if (A <= 0)
     {
         r = g = b = 0;
@@ -28,6 +27,7 @@ LEDColor_umb::LEDColor_umb(const int &colorCode) {
     if ((R + G + B) > 0)
     {
 	    float a = A / 100.0;
+        // if (a >= 1)  a = 1;
 	    // printf("A = %d\n", A);
 	    r_cal = (1.0) * R / (R + G + B);
 	    g_cal = (1.0) * G / (R + G + B);
@@ -52,8 +52,12 @@ LEDColor_umb::LEDColor_umb(const int &colorCode) {
 	    r = int(r_cal);
 	    g = int(g_cal);
 	    b = int(b_cal);
-        rgb = (r << 16) + (g << 8) + b;
 	    // printf("FINAL: R = %d, G = %d, B = %d\n", r, g, b);
+
+        if (r > 255)    r = 255;
+        if (g > 255)    g = 255;
+        if (b > 255)    b = 255;
+        rgb = (r << 16) + (g << 8) + b;
     }
     else
     {
