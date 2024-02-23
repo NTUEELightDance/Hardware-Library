@@ -17,14 +17,14 @@ void LEDColor::setColor(const int &colorCode) {
         g_cal = (1.0) * (G / 255.0) * a;
         b_cal = (1.0) * (B / 255.0) * a;
 
-	r_cal = pow(r_cal, Config::GAMMA_LED_R);
-	g_cal = pow(g_cal, Config::GAMMA_LED_G);
-	b_cal = pow(b_cal, Config::GAMMA_LED_B);
+		r_cal = pow(r_cal, Config::GAMMA_LED_R);
+		g_cal = pow(g_cal, Config::GAMMA_LED_G);
+		b_cal = pow(b_cal, Config::GAMMA_LED_B);
 
         r_cal *= Config::LED_MAX_BRIGHTNESS;
         g_cal *= Config::LED_MAX_BRIGHTNESS;
         b_cal *= Config::LED_MAX_BRIGHTNESS; 
-	r = int(r_cal);
+		r = int(r_cal);
     	g = int(g_cal);
     	b = int(b_cal);
     	rgb = (r << 16) + (g << 8) + b;
@@ -46,6 +46,7 @@ int LEDController::init(const std::vector<int> &shape) {
     
     // initialize WS2812B
     ws2811_return_t ret;
+    num_channel = shape.size();
     for (int i = 0; i < num_channel; i++) {
 	ledString[i].channel[0].count = shape[i];
         if ((ret = ws2811_init(&ledString[i])) != WS2811_SUCCESS) {
