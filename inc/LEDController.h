@@ -40,10 +40,10 @@ class LEDColor {
     uint32_t getRGB();
 
    private:
-    uint32_t rgb;
     int r;
     int g;
     int b;
+    uint32_t rgb;
 };
 
 class LEDController {
@@ -187,7 +187,7 @@ class LEDController {
                             },
                     },
             },
-	    
+
         };
 };
 #endif

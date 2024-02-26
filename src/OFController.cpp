@@ -10,7 +10,7 @@ void OFColor::setColor(const int &colorCode)
     const int B = (colorCode >> 8) & 0xff;
     const int A = (colorCode >> 0) & 0xff;
 
-    float r_cal, g_cal, b_cal;
+    float r_cal = 0.0, g_cal = 0.0, b_cal = 0.0;
     if ((R + G + B) > 0)
     {
         float a = A / Config::OF_BRIGHTNESS_LEVEL * Config::OF_MAX_BRIGHTNESS_SCALING_FACTOR;
@@ -132,14 +132,14 @@ void OFController::I2C_Specified_Init(int i)
 {
     if (ioctl(fd[i], I2C_SLAVE, Config::PCAAddr[i]) < 0)
     {
-        fprintf(stderr, "Failed to acquire bus access and/or talk to slave %d", i);
+//        fprintf(stderr, "Failed to acquire bus access and/or talk to slave %d", i);
     }
     unsigned char buffer[2];
     buffer[0] = 0x45;
     buffer[1] = 0xFF;
     if (write(fd[i], buffer, 2) != 2)
     {
-        fprintf(stderr, "failed to reconnect to I2C bus %x.\n", Config::PCAAddr[i]);
+//        fprintf(stderr, "failed to reconnect to I2C bus %x.\n", Config::PCAAddr[i]);
     }
     else
     {
