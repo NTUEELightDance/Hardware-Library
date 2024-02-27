@@ -24,9 +24,9 @@ namespace Config
     inline constexpr int WS2812_NUM_LED[] = {10, 0, 0, 0, 0, 0, 0, 0}; // number of led for each strip
     inline constexpr int LED_MAX_BRIGHTNESS = 50;                      // LED max brightness
 
-    inline constexpr float GAMMA_LED_R = 3;
-    inline constexpr float GAMMA_LED_G = 3;
-    inline constexpr float GAMMA_LED_B = 3;
+    inline constexpr float GAMMA_LED_R = 1.75;
+    inline constexpr float GAMMA_LED_G = 2.3;
+    inline constexpr float GAMMA_LED_B = 2.5;
 }
 
 #endif // CONFIG_

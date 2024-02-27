@@ -9,31 +9,31 @@ void LEDColor::setColor(const int &colorCode) {
     const int B = (colorCode >> 8) & 0xff;
     const int A = (colorCode >> 0) & 0xff;
 
-    float r_cal, g_cal, b_cal;
+    float r_cal = 0.0, g_cal = 0.0, b_cal = 0.0;
     if ((R + G + B) > 0) {
         float a = A / 255.0;
-        
         r_cal = (1.0) * (R / 255.0) * a;
         g_cal = (1.0) * (G / 255.0) * a;
         b_cal = (1.0) * (B / 255.0) * a;
 
-	r_cal = pow(r_cal, Config::GAMMA_LED_R);
-	g_cal = pow(g_cal, Config::GAMMA_LED_G);
-	b_cal = pow(b_cal, Config::GAMMA_LED_B);
+		r_cal = pow(r_cal, Config::GAMMA_LED_R);
+		g_cal = pow(g_cal, Config::GAMMA_LED_G);
+		b_cal = pow(b_cal, Config::GAMMA_LED_B);
 
         r_cal *= Config::LED_MAX_BRIGHTNESS;
         g_cal *= Config::LED_MAX_BRIGHTNESS;
         b_cal *= Config::LED_MAX_BRIGHTNESS; 
-	r = int(r_cal);
+		
+		r = int(r_cal);
     	g = int(g_cal);
     	b = int(b_cal);
-    	rgb = (r << 16) + (g << 8) + b;
+    	
+		rgb = (r << 16) + (g << 8) + b;
     }
     else {
         r = g = b = 0;
-	rgb = 0;
+		rgb = 0;
     }
-    
 }
 uint32_t LEDColor::getRGB() { return rgb; }
 
@@ -46,8 +46,9 @@ int LEDController::init(const std::vector<int> &shape) {
     
     // initialize WS2812B
     ws2811_return_t ret;
+    num_channel = shape.size();
     for (int i = 0; i < num_channel; i++) {
-	ledString[i].channel[0].count = shape[i];
+		ledString[i].channel[0].count = shape[i];
         if ((ret = ws2811_init(&ledString[i])) != WS2811_SUCCESS) {
             fprintf(stderr, "ws2811_init %d failed: %s\n", i, ws2811_get_return_t_str(ret));
             return ret;
@@ -73,8 +74,8 @@ int LEDController::init(const std::vector<int> &shape) {
 int LEDController::sendAll(const std::vector<std::vector<int>> &statusLists) {
     // Check if data size is consistent with stored during initialization
     for (int i = 0; i < num_channel; i++) {
-        if (statusLists[i].size() > ledString[i].channel[0].count) {
-            fprintf(stderr, "Error: Strip %d is longer then init settings: %d\n", (int)statusLists[i].size(), ledString[i].channel[0].count);
+        if (int(statusLists[i].size()) > int(ledString[i].channel[0].count)) {
+//            fprintf(stderr, "Error: Strip %d is longer then init settings: %d\n", (int)statusLists[i].size(), ledString[i].channel[0].count);
             return -1;
         }
     }
@@ -93,7 +94,7 @@ int LEDController::play(const std::vector<std::vector<int>> &statusLists) {
         }
 
         if ((ret = ws2811_render(&ledString[i])) != WS2811_SUCCESS) {
-            fprintf(stderr, "ws2811_render %d failed: %s\n", i, ws2811_get_return_t_str(ret));
+//            fprintf(stderr, "ws2811_render %d failed: %s\n", i, ws2811_get_return_t_str(ret));
             return ret;
         }
         usleep(ledString[i].channel[0].count * 30);
