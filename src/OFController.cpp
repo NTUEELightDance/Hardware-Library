@@ -68,6 +68,10 @@ int OFController::init()
 
 int OFController::sendAll(const vector<int> &statusLists)
 {
+	unsigned char buffer[2];
+    buffer[0] = 0x45;
+    buffer[1] = 0xFF;
+    write(fd[i], buffer, 2); 
     unsigned char buffer[16];
     buffer[0] = 0x88; // Auto increment PWMx
     int counter;
