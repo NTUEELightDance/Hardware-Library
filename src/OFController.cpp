@@ -67,14 +67,16 @@ int OFController::init()
 }
 
 int OFController::sendAll(const vector<int> &statusLists)
-{
+{    
     unsigned char buffer[16];
     buffer[0] = 0x88; // Auto increment PWMx
     int counter;
     OFColor Status;
     for (int i = 0; i < Config::NUMPCA; i++)
     {
+    	I2C_Specified_Init(i);
         counter = 0;
+        
         if (err_flag[i] == false)
         {
             for (int j = 0; j < 5; j++)
@@ -107,7 +109,6 @@ int OFController::sendAll(const vector<int> &statusLists)
                 }
                 if (write(fd[i], buffer, 16) != 16)
                 {
-                    // fprintf(stderr, "Failed to write to the I2C bus %x.\n", Config::PCAAddr[i]);
                     err_flag[i] = true;
                 }
             }
