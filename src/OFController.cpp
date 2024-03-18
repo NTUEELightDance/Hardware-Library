@@ -81,7 +81,7 @@ int OFController::sendAll(const vector<int> &statusLists)
         {
             for (int j = 0; j < 5; j++)
             {
-                Status.setColor(statusLists[j]);
+                Status.setColor(statusLists[i*5+j]); // remember to get every not just the first 5
                 // fprintf(stderr, "r: %d, g: %d, b:%d\n", Status.getR(), Status.getG(), Status.getB());
                 buffer[counter * 3 + 1] = Status.getR();
                 buffer[counter * 3 + 2] = Status.getG();
